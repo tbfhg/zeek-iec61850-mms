@@ -274,7 +274,7 @@ type INIT_REQ_DETAIL = unit {
 		4 -> additionalCbbSupportedCalling: ASN1::ASN1BitString(self.len.len, self.id.constructed);
 
 		# Initiate request parameter: privilegeClassIdentityCalling
-		5 -> privilegeClassIdentityCalling: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		5 -> privilegeClassIdentityCalling: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 	};
 
@@ -346,7 +346,7 @@ type INIT_RESP_DETAIL = unit {
 		4 -> additionalCbbSupportedCalled: ASN1::ASN1BitString(self.len.len, self.id.constructed);
 
 		# Initiate response parameter: privilegeClassIdentityCalled
-		5 -> privilegeClassIdentityCalled: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		5 -> privilegeClassIdentityCalled: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 	};
 

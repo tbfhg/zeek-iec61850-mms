@@ -182,19 +182,23 @@ type OBJECT_SCOPE = unit {
 	# Get ASN.1 length
 	len: ASN1::LengthType;
 
+	# declare unit variables
+	var vmdspecific: bool = False;
+	var aaspecific: bool = False;
+
 	switch ( self.id.tag ) {
 
 		# VMD-Specific
-		0 -> {
-			var vmdspecific: bool = True;
+		0 -> : bytes &size=0 {
+			self.vmdspecific = True;
 		}
 
 		# Domain-Specific
 		1 -> domainspecific: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 		# AA-Specific
-		2 -> {
-			var aaspecific: bool = True;
+		2 -> : bytes &size=0 {
+			self.aaspecific = True;
 		}
 
 	};
@@ -380,14 +384,17 @@ type WRITE_RESPONSE = unit {
 	# Get ASN.1 length
 	len: ASN1::LengthType;
 
+	# declare unit variables
+	var success: bool = False;
+
 	switch ( self.id.tag ) {
 
 		# Data access error
 		0 -> failure: uint8 &size=self.len.len &convert=DATA_ACCESS_ERROR($$);
 
 		# Data success
-		1 -> {
-			var success: bool = True;
+		1 -> : uint8 {
+			self.success = True;
 		}
 
 	};
@@ -488,6 +495,11 @@ type TYPE_DESCRIPTION = unit {
 	# Get ASN.1 length
 	len: ASN1::LengthType;
 
+	# declare unit variables
+	var boolean: bool &optional;
+	var generalizedtime: bool &optional;
+	var objId: bool &optional;
+
 	switch ( self.id.tag ){
 
 		# Name
@@ -500,8 +512,8 @@ type TYPE_DESCRIPTION = unit {
 		2 -> structure: STRUCTURE[] &size=self.len.len;
 
 		# Boolean value
-		3 -> {
-			var boolean: bool = True;
+		3 -> : bytes &size=0 {
+			self.boolean = True;
 		}
 
 		# Bitstring value
@@ -523,8 +535,8 @@ type TYPE_DESCRIPTION = unit {
 		10 -> visiblestring: bytes &size=self.len.len &convert=$$.to_uint(spicy::ByteOrder::Big);
 
 		# Generalized time value
-		11 -> {
-			var generalizedtime: bool = True;
+		11 -> : bytes &size=0 {
+			self.generalizedtime = True;
 		}
 
 		# Binary time value
@@ -534,8 +546,8 @@ type TYPE_DESCRIPTION = unit {
 		13 -> bcd: bytes &size=self.len.len &convert=$$.to_uint(spicy::ByteOrder::Big);
 
 		# Object identifier value
-		15 -> { 
-			var objId: bool = True;
+		15 -> : bytes &size=0 { 
+			self.objId = True;
 		}
 
 		# MMS string value

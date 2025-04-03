@@ -358,6 +358,7 @@ public type CONFIRMED_REQUEST = unit {
 	# Declaration
 	var invokeID: int64;
 	var fileDelete: string;
+	var identify: bool &optional;
 
 	# ASN.1 message for invoke ID
 	data: ASN1::ASN1Message(True);
@@ -377,8 +378,8 @@ public type CONFIRMED_REQUEST = unit {
 		1 -> getnamelist: mms_lib::GET_NAME_LIST_REQUEST[] &size=self.len.len;
 
 		# Identify
-		2 -> {
-			var identify: bool = True;
+		2 -> : bytes &size=self.len.len {
+			self.identify = True;
 		}
 
 		# Read
@@ -441,6 +442,11 @@ public type CONFIRMED_RESPONSE = unit {
 
 	# Declaration
 	var invokeID: int64;
+	var defineNamedVariableList: bool &optional;
+	var obtainFile: bool &optional;
+	var fileClose: bool &optional;
+	var fileRename: bool &optional;
+	var fileDelete: bool &optional;
 
 	# ASN.1 message for invoke ID
 	data: ASN1::ASN1Message(True);
@@ -472,8 +478,8 @@ public type CONFIRMED_RESPONSE = unit {
 		6 -> getVariableAccessAttributes: mms_lib::GET_VAR_ACCESS_ATTR_RESPONSE[] &size=self.len.len;
 
 		# Define named variable list
-		11 -> {
-			var defineNamedVariableList: bool = True;
+		11 -> : bytes &size=self.len.len {
+			self.defineNamedVariableList = True;
 		}
 
 		# Get named variable list attributes
@@ -483,8 +489,8 @@ public type CONFIRMED_RESPONSE = unit {
 		13 -> deleteNamedVariableList: mms_lib::DELETE_NAMED_VARIABLELIST_RESPONSE[] &size=self.len.len;
 
 		# Obtain file
-		46 -> {
-			var obtainFile: bool = True;
+		46 -> : bytes &size=self.len.len {
+			self.obtainFile = True;
 		}
 
 		# File open
@@ -494,18 +500,18 @@ public type CONFIRMED_RESPONSE = unit {
 		73 -> fileRead: mms_lib::FILE_READ[] &size=self.len.len;
 
 		# File close
-		74 -> {
-			var fileClose: bool = True;
+		74 -> : bytes &size=self.len.len {
+			self.fileClose = True;
 		}
 		
 		# File rename
-		75 -> {
-			var fileRename: bool = True;
+		75 -> : bytes &size=self.len.len {
+			self.fileRename = True;
 		}
 
 		# File delete
-		76 -> {
-			var fileDelete: bool = True;
+		76 -> : bytes &size=self.len.len {
+			self.fileDelete = True;
 		}
 
 		# File directory

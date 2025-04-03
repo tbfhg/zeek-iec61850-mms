@@ -19,13 +19,13 @@ type OBJECT_NAME = unit {
 	switch ( self.id.tag ) {
 
 		# VMD-Specific
-		0 -> vmdspecific: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		0 -> vmdspecific: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 		# Domain-Specific
 		1 -> domainspecific: ASN1::ASN1Message(True)[] &size=self.len.len;
 
 		# AA-Specific
-		2 -> aaspecific: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		2 -> aaspecific: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 	};
 
@@ -147,7 +147,7 @@ type GET_NAME_LIST_REQUEST = unit {
 		1 -> objectScope: OBJECT_SCOPE[] &size=self.len.len;
 
 		# Continue after
-		2 -> continueAfter: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		2 -> continueAfter: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 	};
 
@@ -182,19 +182,23 @@ type OBJECT_SCOPE = unit {
 	# Get ASN.1 length
 	len: ASN1::LengthType;
 
+	# Declaration
+	var vmdspecific: bool = False;
+	var aaspecific: bool = False;
+
 	switch ( self.id.tag ) {
 
 		# VMD-Specific
-		0 -> {
-			var vmdspecific: bool = True;
+		0 -> : bytes &size=0 {
+			self.vmdspecific = True;
 		}
 
 		# Domain-Specific
-		1 -> domainspecific: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		1 -> domainspecific: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 		# AA-Specific
-		2 -> {
-			var aaspecific: bool = True;
+		2 -> : bytes &size=0 {
+			self.aaspecific = True;
 		}
 
 	};
@@ -211,7 +215,7 @@ type IDENTIFIER = unit {
 	len: ASN1::LengthType;
 
 	# Identifier name
-	name: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::ASCII);
+	name: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::ASCII);
 
 };
 
@@ -227,13 +231,13 @@ type IDENTIFY = unit {
 	switch ( self.id.tag ){
 	
 		# Vendor name --> not implemented (ISO 646 character set not available in spicy)
-		0 -> vendorName: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::ASCII);
+		0 -> vendorName: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::ASCII);
 
 		# Model name --> not implemented (ISO 646 character set not available in spicy)
-		1 -> modelName: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::ASCII);
+		1 -> modelName: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::ASCII);
 
 		# Revision --> not implemented (ISO 646 character set not available in spicy)
-		2 -> revision: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::ASCII);
+		2 -> revision: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::ASCII);
 
 		# List of abstract syntaxes --> not implemented
 		3 -> listOfAbstractSyntaxes: bytes &size=self.len.len;
@@ -380,14 +384,17 @@ type WRITE_RESPONSE = unit {
 	# Get ASN.1 length
 	len: ASN1::LengthType;
 
+	# Declaration
+	var success: bool = False;
+
 	switch ( self.id.tag ) {
 
 		# Data access error
 		0 -> failure: uint8 &size=self.len.len &convert=DATA_ACCESS_ERROR($$);
 
 		# Data success
-		1 -> {
-			var success: bool = True;
+		1 -> : uint8 {
+			self.success = True;
 		}
 
 	};
@@ -446,10 +453,10 @@ type GET_VAR_ACCESS_ATTR_RESPONSE = unit {
 		2 -> typeDescription: TYPE_DESCRIPTION &size=self.len.len;
 
 		# Access control list
-		3 -> accessControlList: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		3 -> accessControlList: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 		# Meaning
-		4 -> meaning: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		4 -> meaning: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 	};
 
@@ -470,10 +477,10 @@ type ADDRESS = unit {
 		0 -> numericAddress: bytes &size=self.len.len &convert=$$.to_uint(spicy::ByteOrder::Big);
 
 		# Symbolic address --> not implemented (ISO 646 character set not available in spicy)
-		1 -> symbolicAddress: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::ASCII);
+		1 -> symbolicAddress: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::ASCII);
 
 		# Uncontrained address
-		2 -> unconstrainedAddress: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::ASCII);
+		2 -> unconstrainedAddress: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::ASCII);
 
 	};
 
@@ -488,6 +495,11 @@ type TYPE_DESCRIPTION = unit {
 	# Get ASN.1 length
 	len: ASN1::LengthType;
 
+	# Declaration
+	var boolean: bool &optional;
+	var generalizedtime: bool &optional;
+	var objId: bool &optional;
+
 	switch ( self.id.tag ){
 
 		# Name
@@ -500,8 +512,8 @@ type TYPE_DESCRIPTION = unit {
 		2 -> structure: STRUCTURE[] &size=self.len.len;
 
 		# Boolean value
-		3 -> {
-			var boolean: bool = True;
+		3 -> : bytes &size=0 {
+			self.boolean = True;
 		}
 
 		# Bitstring value
@@ -523,8 +535,8 @@ type TYPE_DESCRIPTION = unit {
 		10 -> visiblestring: bytes &size=self.len.len &convert=$$.to_uint(spicy::ByteOrder::Big);
 
 		# Generalized time value
-		11 -> {
-			var generalizedtime: bool = True;
+		11 -> : bytes &size=0 {
+			self.generalizedtime = True;
 		}
 
 		# Binary time value
@@ -534,8 +546,8 @@ type TYPE_DESCRIPTION = unit {
 		13 -> bcd: bytes &size=self.len.len &convert=$$.to_uint(spicy::ByteOrder::Big);
 
 		# Object identifier value
-		15 -> { 
-			var objId: bool = True;
+		15 -> : bytes &size=0 { 
+			self.objId = True;
 		}
 
 		# MMS string value
@@ -616,7 +628,7 @@ type COMPONENT = unit {
 	switch ( self.id.tag ){
 	
 		# Component name
-		0 -> componentName: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		0 -> componentName: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 		# Component type --> not implemented
 		1 -> componentType: bytes &size=self.len.len;
@@ -664,7 +676,7 @@ type GET_NAMED_VAR_LIST_ATTR = unit {
 		1 -> listOfVariable: LIST_OF_VAR[] &size=self.len.len;
 
 		# Access control list
-		2 -> accessControlList: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		2 -> accessControlList: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 	};
 
@@ -691,7 +703,7 @@ type DELETE_NAMED_VARIABLELIST_REQUEST = unit {
 		2 -> {
 			nameid: ID;
 			namelength: ASN1::LengthType;
-			domainName: ASN1::ASN1OctetString(self.namelength.len, self.nameid.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+			domainName: ASN1::ASN1OctetString(self.namelength.len, self.nameid.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 		}		
 
 	};
@@ -779,13 +791,13 @@ type DATA = unit {
 		7 -> floatingpoint: FLOAT(self.len.len) &size=self.len.len;
 
 		# Octetstring value
-		9 -> octetstring: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::ASCII);
+		9 -> octetstring: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::ASCII);
 
 		# Visible string value
-		10 -> visiblestring: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		10 -> visiblestring: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 		# Generalized time value
-		11 -> generalizedtime: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::ASCII);
+		11 -> generalizedtime: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::ASCII);
 
 		# Binary time (relative day since January 1, 1984)
 		12 -> binaryTime: BINARY_TIME &size=self.len.len;
@@ -800,7 +812,7 @@ type DATA = unit {
 		15 -> objId: ASN1::ASN1ObjectIdentifier(self.len.len) &convert=$$.oidstring;
 
 		# MMS String value --> not implemented (ISO 646 character set not available in spicy)
-		16 -> mMSString: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::ASCII);
+		16 -> mMSString: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::ASCII);
 
 		# UTC Time (elapsed number of seconds since GMT midnight January 1, 1970)
 		17 -> utcTime: UTC_TIME &size=self.len.len;
@@ -971,7 +983,7 @@ type FILE_READ = unit {
 	switch ( self.id.tag ){
 
 		# File data
-		0 -> fileData: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::ASCII);
+		0 -> fileData: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::ASCII);
 
 		# More follows
 		1 -> moreFollows: uint8 &convert=cast<bool>($$) &requires=self.len.len==1;
@@ -1035,7 +1047,7 @@ type FILE_DIR_REQUEST = unit {
 		}
 
 		# Continue after
-		1 -> continueAfter: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::UTF8);
+		1 -> continueAfter: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::UTF8);
 
 	};
 
@@ -1120,7 +1132,7 @@ type FILE_ATTRIBUTES = unit {
 		0 -> sizeOfFile: bytes &size=self.len.len &convert=$$.to_uint(spicy::ByteOrder::Big);
 
 		# Last modified
-		1 -> lastModified: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(hilti::Charset::ASCII);
+		1 -> lastModified: ASN1::ASN1OctetString(self.len.len, self.id.constructed) &convert=$$.value.decode(spicy::Charset::ASCII);
 
 	};
 
@@ -1146,7 +1158,7 @@ type PARA_SUPPORT_OPTIONS = unit {
 	var CSPLC: bool;
 	var CSPI: bool;
 
-	: bitfield(8) {
+	field1 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1166,7 +1178,7 @@ type PARA_SUPPORT_OPTIONS = unit {
 		self.VLIS = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field2 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1276,7 +1288,7 @@ type SERVICE_SUPPORT_OPTIONS = unit {
 	var CONCLUDE: bool;
 	var CANCEL: bool;
 
-	: bitfield(8) {
+	field1 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1296,7 +1308,7 @@ type SERVICE_SUPPORT_OPTIONS = unit {
 		self.DEFINE_NAMED_VARIABLE = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field2 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1316,7 +1328,7 @@ type SERVICE_SUPPORT_OPTIONS = unit {
 		self.GET_NAMED_TYPE_ATTRIBUTES = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field3 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1336,7 +1348,7 @@ type SERVICE_SUPPORT_OPTIONS = unit {
 		self.REPORT_SEMAPHORE_STATUS = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field4 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1376,7 +1388,7 @@ type SERVICE_SUPPORT_OPTIONS = unit {
 		self.DELETE_PROGRAM_INVOCATION = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field6 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1396,7 +1408,7 @@ type SERVICE_SUPPORT_OPTIONS = unit {
 		self.DEFINE_EVENT_CONDITION = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field7 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1416,7 +1428,7 @@ type SERVICE_SUPPORT_OPTIONS = unit {
 		self.GET_EVENT_ACTION_ATTRIBUTES = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field8 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1436,7 +1448,7 @@ type SERVICE_SUPPORT_OPTIONS = unit {
 		self.GET_ALARM_SUMMARY = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field9 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1456,7 +1468,7 @@ type SERVICE_SUPPORT_OPTIONS = unit {
 		self.GET_CAPABILITY_LIST = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field10 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1476,7 +1488,7 @@ type SERVICE_SUPPORT_OPTIONS = unit {
 		self.INFORMATION_REPORT = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field11 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1520,7 +1532,7 @@ type ADDITIONAL_SUPPORT_OPTIONS = unit {
 	var REPORT_EVENT_CONDITION_LIST_STATUS: bool;
 	var ALTER_EVENT_CONDITION_LIST_MONITORING: bool;
 
-	: bitfield(8) {
+	field1 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1540,7 +1552,7 @@ type ADDITIONAL_SUPPORT_OPTIONS = unit {
 		self.START_UNIT_CONTROL = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field2 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1560,7 +1572,7 @@ type ADDITIONAL_SUPPORT_OPTIONS = unit {
 		self.DELETE_UNIT_CONTROL = $$.bit8==1;
 	}
 
-	: bitfield(8) {
+	field3 : bitfield(8) {
 		bit1: 7;
 		bit2: 6;
 		bit3: 5;
@@ -1589,7 +1601,7 @@ type ID = unit {
 	var constructed: bool;
 
 	# Get ASN.1 tag information from leading octet
-	: bitfield(8) {
+	field1 : bitfield(8) {
 		tag: 0..4;
 		constructed: 5;
 		class: 6..7;
@@ -1600,7 +1612,7 @@ type ID = unit {
 	}
 
 	# Get ASN.1 tag information from subsequent octet
-	: bitfield(8) {
+	field2 : bitfield(8) {
 		tag: 0..6;
 		flag: 7;
 	} if ( self.tag == 31 ) {

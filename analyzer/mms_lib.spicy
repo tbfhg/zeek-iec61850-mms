@@ -182,7 +182,7 @@ type OBJECT_SCOPE = unit {
 	# Get ASN.1 length
 	len: ASN1::LengthType;
 
-	# declare unit variables
+	# Declaration
 	var vmdspecific: bool = False;
 	var aaspecific: bool = False;
 
@@ -384,7 +384,7 @@ type WRITE_RESPONSE = unit {
 	# Get ASN.1 length
 	len: ASN1::LengthType;
 
-	# declare unit variables
+	# Declaration
 	var success: bool = False;
 
 	switch ( self.id.tag ) {
@@ -495,7 +495,7 @@ type TYPE_DESCRIPTION = unit {
 	# Get ASN.1 length
 	len: ASN1::LengthType;
 
-	# declare unit variables
+	# Declaration
 	var boolean: bool &optional;
 	var generalizedtime: bool &optional;
 	var objId: bool &optional;

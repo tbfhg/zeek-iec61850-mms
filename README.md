@@ -1,3 +1,6 @@
+This repo is now archived due to changes implemented in the upstream repository.
+Use https://github.com/DINA-community/icsnpp-iec61850-mms instead.
+
 # IEC 61850-MMS parser
 
 IEC 61850-8-1 (MMS) Parser - Communication networks and systems for power utility automation: Mappings to MMS (ISO 9506-1 and ISO 9506-2).
